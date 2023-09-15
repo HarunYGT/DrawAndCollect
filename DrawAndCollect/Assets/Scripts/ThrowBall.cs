@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,32 +11,47 @@ public class ThrowBall : MonoBehaviour
     [SerializeField] private GameObject throwBallCenter;
     int ActiveBallIndex;
     int RandomBucketIndex;
-
-    void Update()
+    bool Lock;
+    
+    public void GameStart()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        StartCoroutine(BallThrowSystem());
+    }
+    IEnumerator BallThrowSystem()
+    {
+        while (true)
         {
-            Balls[ActiveBallIndex].transform.position = throwBallCenter.transform.position;
-            Balls[ActiveBallIndex].SetActive(true);
-            float degree = Random.Range(70,110);
-            Vector3 Pos = Quaternion.AngleAxis(degree,Vector3.forward)*Vector3.right; 
-            Balls[ActiveBallIndex].gameObject.GetComponent<Rigidbody2D>().AddForce(Pos*750f);
+            if (!Lock)
+            {
+                yield return new WaitForSeconds(.5f);
+                Balls[ActiveBallIndex].transform.position = throwBallCenter.transform.position;
+                Balls[ActiveBallIndex].SetActive(true);
+                float degree = UnityEngine.Random.Range(70, 110);
+                Vector3 Pos = Quaternion.AngleAxis(degree, Vector3.forward) * Vector3.right;
+                Balls[ActiveBallIndex].GetComponent<Rigidbody2D>().AddForce(Pos * 750f);
 
-            if(ActiveBallIndex != Balls.Length-1)
-                ActiveBallIndex++;
+                if (ActiveBallIndex != Balls.Length - 1)
+                    ActiveBallIndex++;
+                else
+                    ActiveBallIndex = 0;
+                
+                yield return new WaitForSeconds(.5f);
+
+                RandomBucketIndex = UnityEngine.Random.Range(0, BucketPoint.Length - 1);
+                Bucket.transform.position = BucketPoint[RandomBucketIndex].transform.position;
+                Bucket.SetActive(true);
+                Lock = true;
+            }
             else
-                ActiveBallIndex=0;
-
-            
-            Invoke("RevealTheBucket",.5f);
+            {
+                yield return null;
+            }
         }
     }
-    void RevealTheBucket()
+    public void Return()
     {
-        RandomBucketIndex = Random.Range(0,BucketPoint.Length-1);
-        Bucket.transform.position = BucketPoint[RandomBucketIndex].transform.position;
-        Bucket.SetActive(true);
-
+        Lock = false;
+        Bucket.SetActive(false);
     }
-
+    
 }

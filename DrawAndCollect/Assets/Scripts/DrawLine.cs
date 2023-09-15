@@ -10,30 +10,42 @@ public class DrawLine : MonoBehaviour
     public LineRenderer lineRenderer;
     public EdgeCollider2D edgeCollider2D;
     public List<Vector2> fingerPosList;
+
+    public List<GameObject> Lines;
+    bool isDraw;
+    void Start()
+    {
+        isDraw =false;
+    }
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (isDraw)
         {
-            CreateLine();
+            if (Input.GetMouseButtonDown(0))
+            {
+                CreateLine();
+            }
+            if (Input.GetMouseButton(0))
+            {
+                Vector2 fingerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                if (Vector2.Distance(fingerPos, fingerPosList[^1]) > .1f)
+                    UpdateTheLine(fingerPos);
+            }
         }
-        if(Input.GetMouseButton(0))
-        {
-            Vector2 fingerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if(Vector2.Distance(fingerPos,fingerPosList[^1])>.1f) 
-                UpdateTheLine(fingerPos);
-        }
+
     }
     void CreateLine()
     {
-        line = Instantiate(linePrefab,Vector2.zero,Quaternion.identity);
+        line = Instantiate(linePrefab, Vector2.zero, Quaternion.identity);
+        Lines.Add(line);
         lineRenderer = line.GetComponent<LineRenderer>();
-        edgeCollider2D =  line.GetComponent<EdgeCollider2D>();
+        edgeCollider2D = line.GetComponent<EdgeCollider2D>();
         fingerPosList.Clear();
         fingerPosList.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         fingerPosList.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-        lineRenderer.SetPosition(0,fingerPosList[0]);
-        lineRenderer.SetPosition(1,fingerPosList[1]);
+        lineRenderer.SetPosition(0, fingerPosList[0]);
+        lineRenderer.SetPosition(1, fingerPosList[1]);
         edgeCollider2D.points = fingerPosList.ToArray();
     }
 
@@ -41,7 +53,23 @@ public class DrawLine : MonoBehaviour
     {
         fingerPosList.Add(fingerPos);
         lineRenderer.positionCount++;
-        lineRenderer.SetPosition(lineRenderer.positionCount-1,fingerPos);
+        lineRenderer.SetPosition(lineRenderer.positionCount - 1, fingerPos);
         edgeCollider2D.points = fingerPosList.ToArray();
+    }
+    public void Return()
+    {
+        foreach (var item in Lines)
+        {
+            Destroy(item.gameObject);
+        }
+        Lines.Clear();
+    }
+    public void Drawing()
+    {
+        isDraw = true;
+    }
+    public void NotDraw()
+    {
+        isDraw = false;
     }
 }

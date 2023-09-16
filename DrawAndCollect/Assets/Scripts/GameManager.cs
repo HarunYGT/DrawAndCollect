@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     int ScoredBall;
     void Start()
     {
+        ScoredBall = 0;
         if(PlayerPrefs.HasKey("BestScore"))
         {
             BestScoreTexts[0].text = PlayerPrefs.GetInt("BestScore").ToString();
@@ -34,12 +35,14 @@ public class GameManager : MonoBehaviour
     public void Return()
     {
         ScoredBall++;
-        drawLine.Return();
         throwBall.Return();
+        drawLine.Return();
     }
     public void GameOver()
     {
+        Sounds[2].Play();
         Panels[1].SetActive(true);
+        Panels[2].SetActive(false);
         BestScoreTexts[1].text = PlayerPrefs.GetInt("BestScore").ToString();
         BestScoreTexts[2].text = ScoredBall.ToString();
 
@@ -61,6 +64,7 @@ public class GameManager : MonoBehaviour
         throwBall.GameStart();
         drawLine.Drawing();
         Panels[0].SetActive(false); 
+        Panels[2].SetActive(true);
     }
     public void TryAgain()
     {

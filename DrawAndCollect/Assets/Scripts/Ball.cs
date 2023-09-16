@@ -12,7 +12,6 @@ public class Ball : MonoBehaviour
         {
             gameObject.SetActive(false);
             gameManager.GameOver();
-            gameManager.PlaySounds(2);
         }
         else if (collision.gameObject.CompareTag("BallEntered"))
         {

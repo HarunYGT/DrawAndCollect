@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class DrawLine : MonoBehaviour
@@ -10,17 +11,21 @@ public class DrawLine : MonoBehaviour
     public LineRenderer lineRenderer;
     public EdgeCollider2D edgeCollider2D;
     public List<Vector2> fingerPosList;
+    [SerializeField] TextMeshProUGUI drawText;
 
     public List<GameObject> Lines;
     bool isDraw;
+    int DrawNum;
     void Start()
     {
-        isDraw =false;
+        isDraw = false;
+        DrawNum = 3;
+        drawText.text = DrawNum.ToString();
     }
     // Update is called once per frame
     void Update()
     {
-        if (isDraw)
+        if (isDraw && DrawNum != 0)
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -31,6 +36,14 @@ public class DrawLine : MonoBehaviour
                 Vector2 fingerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 if (Vector2.Distance(fingerPos, fingerPosList[^1]) > .1f)
                     UpdateTheLine(fingerPos);
+            }
+        }
+        if (Lines.Count != 0 && DrawNum != 0)
+        {
+            if (Input.GetMouseButtonUp(0))
+            {
+                DrawNum--;
+                drawText.text = DrawNum.ToString();
             }
         }
 
@@ -58,14 +71,20 @@ public class DrawLine : MonoBehaviour
     }
     public void Return()
     {
-        foreach (var item in Lines)
+        if (ThrowBall.numOfBall == 0)
         {
-            Destroy(item.gameObject);
+            foreach (var item in Lines)
+            {
+                Destroy(item.gameObject);
+            }
+            Lines.Clear();
+            DrawNum = 3;
+            drawText.text = DrawNum.ToString();
         }
-        Lines.Clear();
     }
     public void Drawing()
     {
+        DrawNum = 3;
         isDraw = true;
     }
     public void NotDraw()
